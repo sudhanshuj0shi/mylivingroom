@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import { HouseScene } from '../world/HouseScene'
+import type { LookMode } from '../world/Player'
 import { WelcomeOverlay } from '../components/ui/WelcomeOverlay'
 import { ControlsHint } from '../components/ui/ControlsHint'
 
@@ -15,6 +16,7 @@ import { ControlsHint } from '../components/ui/ControlsHint'
 export function App() {
   const [locked, setLocked] = useState(false)
   const [hasEntered, setHasEntered] = useState(false)
+  const [lookMode, setLookMode] = useState<LookMode>('mouse')
 
   return (
     <>
@@ -28,14 +30,15 @@ export function App() {
         gl={{ toneMapping: THREE.NeutralToneMapping, toneMappingExposure: 1.05 }}
       >
         <HouseScene
-          onLockChange={(isLocked) => {
+          onLockChange={(isLocked, mode) => {
             setLocked(isLocked)
+            setLookMode(mode)
             if (isLocked) setHasEntered(true)
           }}
         />
       </Canvas>
       <div className="vignette" aria-hidden="true" />
-      {locked && <ControlsHint />}
+      {locked && <ControlsHint mode={lookMode} />}
       {/* Kept mounted while hidden: the pointer-lock control is wired to this exact button element. */}
       <WelcomeOverlay hidden={locked} returning={hasEntered} />
     </>

@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { PointerLockControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { useKeyboard } from '../systems/movement/useKeyboard'
+import { useDragLook } from '../systems/movement/useDragLook'
 import { moveWithCollision, type Box2D } from '../systems/collision/collision'
 
 /** Tuning values. Change these and reload to feel the difference. */
@@ -15,12 +16,18 @@ export const PLAYER = {
   acceleration: 10,
 }
 
+export type LookMode = 'mouse' | 'drag'
+
 type Props = {
   colliders: readonly Box2D[]
   /** Where the visitor starts, on the floor. */
   start: [number, number]
-  /** Called when the mouse is captured (true) or released (false). */
-  onLockChange: (locked: boolean) => void
+  /**
+   * Called when the visitor enters (true) or pauses (false). `mode` says how
+   * they look around: 'mouse' when the mouse is captured, 'drag' for the
+   * click-and-drag fallback.
+   */
+  onLockChange: (locked: boolean, mode: LookMode) => void
 }
 
 // Reused every frame instead of creating new objects 60 times a second.
@@ -52,6 +59,15 @@ export function Player({ colliders, start, onLockChange }: Props) {
   const initialised = useRef(false)
   // Movement only happens while the mouse is captured, i.e. while you're "in" the house.
   const locked = useRef(false)
+
+  // If the mouse can't be captured, fall back to click-and-drag looking.
+  useDragLook({
+    onActiveChange: (active) => {
+      locked.current = active
+      if (!active) keys.current.clear()
+      onLockChange(active, 'drag')
+    },
+  })
 
   useFrame((_, rawDelta) => {
     if (!initialised.current) {
@@ -104,12 +120,12 @@ export function Player({ colliders, start, onLockChange }: Props) {
       selector="#enter-house"
       onLock={() => {
         locked.current = true
-        onLockChange(true)
+        onLockChange(true, 'mouse')
       }}
       onUnlock={() => {
         locked.current = false
         keys.current.clear()
-        onLockChange(false)
+        onLockChange(false, 'mouse')
       }}
     />
   )

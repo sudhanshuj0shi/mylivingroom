@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { Lighting } from './Lighting'
 import { palette } from './palette'
-import { Player } from './Player'
+import { Player, type LookMode } from './Player'
 import { Hallway } from '../rooms/hallway/Hallway'
 import { buildColliders } from '../rooms/hallway/layout'
 
 type Props = {
-  onLockChange: (locked: boolean) => void
+  onLockChange: (locked: boolean, mode: LookMode) => void
 }
 
 /**
