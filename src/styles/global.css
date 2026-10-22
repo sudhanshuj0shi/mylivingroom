@@ -1,0 +1,217 @@
+:root {
+  --turmeric: #e0a23a;
+  --turmeric-deep: #b97a1c;
+  --lime: #f6efe1;
+  --cobalt: #2756a6;
+  --azulejo: #1e4e9c;
+  --red-oxide: #9a3b27;
+  --bougainvillea: #d2207a;
+  --ink: #2a1a12;
+  --ink-soft: #5a4334;
+
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #f7d9a8;
+  font-family: var(--sans);
+  color: var(--ink);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.scene {
+  position: fixed !important;
+  inset: 0;
+}
+
+/* Darkens the screen edges slightly, like an old photograph; draws the eye to the centre. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(60, 25, 10, 0.35) 100%);
+}
+
+/* ---------- Welcome / pause card ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(70, 30, 15, 0.28);
+  backdrop-filter: blur(3px);
+  animation: fade-in 0.5s ease both;
+}
+
+.card {
+  position: relative;
+  width: min(460px, 100%);
+  padding: 34px 32px 28px;
+  background: var(--lime);
+  border-radius: 6px;
+  box-shadow: 0 24px 60px rgba(60, 25, 10, 0.35);
+  overflow: hidden;
+}
+
+/* An azulejo-blue band along the top of the card, echoing the tiled dado in the room. */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 10px;
+  background:
+    radial-gradient(circle at 10px 5px, var(--lime) 2.5px, transparent 3px) 0 0 / 20px 10px,
+    var(--azulejo);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bougainvillea);
+  font-weight: 500;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(28px, 5vw, 36px);
+  line-height: 1.1;
+  color: var(--red-oxide);
+}
+
+.lede,
+.note {
+  margin: 0 0 22px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.enter {
+  display: inline-block;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--cobalt);
+  color: var(--lime);
+  font: 500 15px var(--sans);
+  cursor: pointer;
+  box-shadow: 0 6px 0 #173a78;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.enter:hover {
+  transform: translateY(-1px);
+}
+
+.enter:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #173a78;
+}
+
+.enter:focus-visible {
+  outline: 3px solid var(--turmeric);
+  outline-offset: 3px;
+}
+
+.controls {
+  margin: 24px 0 0;
+  padding: 16px 0 0;
+  list-style: none;
+  border-top: 1px dashed rgba(90, 67, 52, 0.3);
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+kbd {
+  display: inline-block;
+  min-width: 22px;
+  margin-right: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid rgba(90, 67, 52, 0.25);
+  border-bottom-width: 2px;
+  font: 500 12px var(--sans);
+  text-align: center;
+  color: var(--ink);
+}
+
+/* ---------- While walking ---------- */
+
+.crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 248, 235, 0.85);
+  box-shadow: 0 0 0 1.5px rgba(60, 25, 10, 0.35);
+  pointer-events: none;
+}
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(246, 239, 225, 0.88);
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  animation: hint-out 6s ease forwards;
+}
+
+.hint kbd {
+  font-size: 11px;
+  margin: 0 2px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hint-out {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .hint {
+    animation: none;
+  }
+}
