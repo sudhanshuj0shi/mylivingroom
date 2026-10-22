@@ -20,7 +20,8 @@ export function FlowerPot({ position, seed = 1 }: Props) {
         <torusGeometry args={[0.3, 0.035, 8, 24]} />
         <meshStandardMaterial color={palette.redOxide} roughness={0.9} />
       </mesh>
-      <BlossomCluster position={[0, 0.72, 0]} radius={0.42} seed={seed} />
+      {/* Indoors, so the breeze reaches it at half strength. */}
+      <BlossomCluster position={[0, 0.72, 0]} radius={0.42} seed={seed} shelter={0.5} />
     </group>
   )
 }

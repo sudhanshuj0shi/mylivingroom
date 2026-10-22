@@ -205,3 +205,72 @@ export function repeated(texture: THREE.Texture, x: number, y: number) {
   copy.needsUpdate = true
   return copy
 }
+
+/** Teak floorboards: a few planks per tile with varied tone and visible joints. */
+export function teakFloorTexture() {
+  return makeTexture('teakFloor', 512, (ctx, s) => {
+    const rand = seeded(29)
+    const planks = 4
+    const w = s / planks
+    for (let i = 0; i < planks; i++) {
+      // Each plank is cut at a different point so the joints are staggered.
+      const cut = rand() * s
+      for (const [y0, y1] of [[0, cut], [cut, s]]) {
+        const tone = 0.85 + rand() * 0.25
+        ctx.fillStyle = `rgb(${Math.round(140 * tone)},${Math.round(86 * tone)},${Math.round(50 * tone)})`
+        ctx.fillRect(i * w, y0, w, y1 - y0)
+        for (let g = 0; g < 14; g++) {
+          const x = i * w + rand() * w
+          ctx.strokeStyle = `rgba(50,25,10,${0.06 + rand() * 0.12})`
+          ctx.lineWidth = 0.5 + rand() * 2
+          ctx.beginPath()
+          ctx.moveTo(x, y0)
+          ctx.lineTo(x + rand() * 4 - 2, y1)
+          ctx.stroke()
+        }
+        ctx.fillStyle = 'rgba(40,20,8,0.6)'
+        ctx.fillRect(i * w, y1 - 2, w, 2)
+      }
+      ctx.fillStyle = 'rgba(40,20,8,0.7)'
+      ctx.fillRect(i * w, 0, 2, s)
+    }
+    addGrain(ctx, s, 3000, 31)
+  })
+}
+
+/** Black-and-white chequered tiles, common in Goan halls, here for the music room. */
+export function checkerTexture() {
+  return makeTexture('checker', 256, (ctx, s) => {
+    const h = s / 2
+    ctx.fillStyle = '#F1EBDF'
+    ctx.fillRect(0, 0, s, s)
+    ctx.fillStyle = '#1C1A1E'
+    ctx.fillRect(0, 0, h, h)
+    ctx.fillRect(h, h, h, h)
+    ctx.strokeStyle = 'rgba(120,110,100,0.5)'
+    ctx.lineWidth = 2
+    ctx.strokeRect(0, 0, h, h)
+    ctx.strokeRect(h, h, h, h)
+    addGrain(ctx, s, 1500, 37)
+  })
+}
+
+/** Polished red-oxide floor: one colour, with soft cloudy variation. */
+export function redOxideTexture() {
+  return makeTexture('redOxide', 512, (ctx, s) => {
+    ctx.fillStyle = '#A13F2A'
+    ctx.fillRect(0, 0, s, s)
+    const rand = seeded(41)
+    for (let i = 0; i < 160; i++) {
+      const x = rand() * s
+      const y = rand() * s
+      const r = 30 + rand() * 90
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+      g.addColorStop(0, rand() > 0.5 ? 'rgba(255,200,170,0.06)' : 'rgba(60,10,5,0.08)')
+      g.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = g
+      ctx.fillRect(x - r, y - r, r * 2, r * 2)
+    }
+    addGrain(ctx, s, 4000, 43)
+  })
+}

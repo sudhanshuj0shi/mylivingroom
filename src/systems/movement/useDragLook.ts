@@ -1,28 +1,22 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { house } from '../../state/houseStore'
 
 /**
  * Fallback look controls: click and drag to turn the camera.
  *
  * Normally the Enter button captures the mouse ("pointer lock"). Some places
- * refuse that, such as a page embedded in a sandboxed frame, or a browser
- * that blocks it. Without a fallback the visitor would click Enter and
- * nothing would happen. So: if the lock fails or hasn't happened shortly after
- * the click, we switch to dragging instead.
+ * refuse that, such as a page embedded in a sandboxed frame. Without a
+ * fallback, clicking Enter would do nothing. So: if the lock fails, or hasn't
+ * happened shortly after the first Enter click, we switch to dragging instead.
  *
  * Rotation uses Euler angles in 'YXZ' order: turn left/right (Y) first, then
  * tilt up/down (X). That order keeps the horizon level, like turning your
  * head. Pitch is clamped so you can't flip upside down.
  */
-export function useDragLook(options: {
-  /** Called when drag mode starts (true) or the visitor presses Esc in it (false). */
-  onActiveChange: (active: boolean) => void
-}) {
+export function useDragLook() {
   const { camera, gl } = useThree()
-  const active = useRef(false)
-  const optionsRef = useRef(options)
-  optionsRef.current = options
 
   useEffect(() => {
     const euler = new THREE.Euler(0, 0, 0, 'YXZ')
@@ -31,15 +25,11 @@ export function useDragLook(options: {
     let timer: number | undefined
 
     const activate = () => {
-      if (active.current || document.pointerLockElement) return
-      active.current = true
-      optionsRef.current.onActiveChange(true)
-    }
-    const deactivate = () => {
-      if (!active.current) return
-      active.current = false
-      dragging = false
-      optionsRef.current.onActiveChange(false)
+      const s = house.get()
+      // Once mouse capture has worked, a later refusal (e.g. re-entering too
+      // quickly after Esc) just leaves you on the pause card instead.
+      if (document.pointerLockElement || s.mouseLockWorked || (s.walking && s.lookMode === 'drag')) return
+      house.set({ walking: true, entered: true, lookMode: 'drag' })
     }
 
     // After the Enter click, give pointer lock a moment; if it didn't happen, fall back.
@@ -47,13 +37,17 @@ export function useDragLook(options: {
       window.clearTimeout(timer)
       timer = window.setTimeout(activate, 500)
     }
+    const isDragWalking = () => {
+      const s = house.get()
+      return s.walking && s.lookMode === 'drag'
+    }
     const onDown = (e: PointerEvent) => {
-      if (!active.current) return
+      if (!isDragWalking()) return
       dragging = true
       canvas.setPointerCapture(e.pointerId)
     }
     const onMove = (e: PointerEvent) => {
-      if (!active.current || !dragging) return
+      if (!dragging || !isDragWalking()) return
       euler.setFromQuaternion(camera.quaternion)
       euler.y -= e.movementX * 0.004
       euler.x -= e.movementY * 0.004
@@ -63,9 +57,6 @@ export function useDragLook(options: {
     const onUp = () => {
       dragging = false
     }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Escape') deactivate()
-    }
 
     const enter = document.getElementById('enter-house')
     enter?.addEventListener('click', onEnterClick)
@@ -73,7 +64,6 @@ export function useDragLook(options: {
     canvas.addEventListener('pointerdown', onDown)
     canvas.addEventListener('pointermove', onMove)
     canvas.addEventListener('pointerup', onUp)
-    window.addEventListener('keydown', onKey)
     return () => {
       window.clearTimeout(timer)
       enter?.removeEventListener('click', onEnterClick)
@@ -81,7 +71,6 @@ export function useDragLook(options: {
       canvas.removeEventListener('pointerdown', onDown)
       canvas.removeEventListener('pointermove', onMove)
       canvas.removeEventListener('pointerup', onUp)
-      window.removeEventListener('keydown', onKey)
     }
   }, [camera, gl])
 }

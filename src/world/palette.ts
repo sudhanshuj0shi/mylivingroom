@@ -13,6 +13,18 @@ export const palette = {
   rose: '#D98A8E', // poetry room
   teal: '#1F6F6A', // music room
 
+  // The lime-wash actually used on walls: the room colours, lifted so they
+  // stay bright indoors once lighting darkens them a little.
+  workWall: '#5585D2',
+  musicWall: '#2A857F',
+  poetryWall: '#F0A9AC',
+
+  // Outside
+  grass: '#7BA84A',
+  laterite: '#A4512F', // Goa's red earth and stone
+  palmTrunk: '#8A6A4A',
+  palmLeaf: '#4E8B3A',
+
   // Shared materials
   limeWhite: '#F3ECDD', // trim, ceilings, window frames
   redOxide: '#9A3B27', // floor tiles, terracotta
@@ -30,5 +42,5 @@ export const palette = {
   sky: '#A9D6EC', // the afternoon sky seen through windows
   sun: '#FFD9A3',
   skyFill: '#FFE8C7',
-  groundFill: '#8A4A2E',
+  groundFill: '#D9A27A', // light bounced up off warm floors; too dark and ceilings turn brown
 } as const
